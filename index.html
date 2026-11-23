@@ -8,6 +8,9 @@
 <meta name="description" content="Список грехов и стихи Библии о каждом из них. Синодальный перевод.">
 <meta name="theme-color" content="#1b2420">
 <link rel="preload" href="atziluth-title.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #faf9f6;
@@ -21,8 +24,9 @@
   }
   * { box-sizing: border-box; }
   html { -webkit-text-size-adjust: 100%; }
-  /* Шрифт названия: Atziluth Script (только буквы названия; Č добавлена вручную из háčku). */
+  /* Название: RU — Atziluth Script (в файле только буквы русского названия), SK — Great Vibes (в Atziluth нет Č и плохое í). */
   @font-face { font-family: "Atziluth"; src: url("atziluth-title.woff2") format("woff2"); font-display: swap; }
+  html[lang="sk"] h1 { font-family: "Great Vibes", cursive; }
   body {
     margin: 0; background: #1b2420; color: var(--text);
     font: 17px/1.55 Arial, "Helvetica Neue", Helvetica, sans-serif;
