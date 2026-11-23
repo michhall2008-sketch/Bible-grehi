@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- ВРЕМЕННОЕ НАЗВАНИЕ: замените, когда придумаете своё (здесь и в <h1> ниже) -->
+<title>Что Библия говорит о грехе</title>
+<meta name="description" content="Список грехов и стихи Библии о каждом из них. Синодальный перевод.">
+<meta name="theme-color" content="#faf9f6">
+<style>
+  :root {
+    --bg: #faf9f6;
+    --surface: #ffffff;
+    --text: #1d1d1b;
+    --muted: #6b6a66;
+    --line: #e7e4dd;
+    --accent: #7a5c2e;
+    --accent-soft: #f3ece0;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 17px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 0 16px; }
+  header.top { padding: 28px 0 8px; }
+  h1 { font-size: 26px; line-height: 1.2; margin: 0 0 4px; font-weight: 700; letter-spacing: -0.01em; }
+  .sub { color: var(--muted); font-size: 15px; margin: 0; }
+
+  .bar {
+    position: sticky; top: 0; z-index: 5; background: var(--bg);
+    padding: 12px 0 10px; border-bottom: 1px solid var(--line);
+  }
+  .search { position: relative; }
+  .search input {
+    width: 100%; font: inherit; font-size: 17px; padding: 12px 44px 12px 14px;
+    border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); color: var(--text);
+    -webkit-appearance: none; appearance: none;
+  }
+  .search input:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: transparent; }
+  .search input::-webkit-search-cancel-button { -webkit-appearance: none; display: none; }
+  .clear {
+    position: absolute; right: 4px; top: 50%; transform: translateY(-50%);
+    width: 40px; height: 40px; border: 0; background: none; color: var(--muted);
+    font-size: 22px; cursor: pointer; border-radius: 50%; display: none;
+  }
+  .clear.show { display: block; }
+  .chips {
+    display: flex; gap: 8px; overflow-x: auto; margin: 10px -16px 0; padding: 0 16px 2px;
+    scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip {
+    flex: 0 0 auto; font: inherit; font-size: 14px; padding: 7px 13px; border-radius: 999px;
+    border: 1px solid var(--line); background: var(--surface); color: var(--text); cursor: pointer; white-space: nowrap;
+  }
+  .chip[aria-pressed="true"] { background: var(--text); border-color: var(--text); color: #fff; }
+
+  main { padding: 8px 0 48px; }
+  .cat { margin-top: 22px; }
+  .cat h2 {
+    font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted);
+    margin: 0 0 8px; font-weight: 600;
+  }
+  .list { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  .sin + .sin { border-top: 1px solid var(--line); }
+  .sin > button {
+    width: 100%; display: flex; align-items: center; gap: 12px; text-align: left;
+    font: inherit; font-size: 17px; color: var(--text); background: none; border: 0;
+    padding: 14px 14px; min-height: 52px; cursor: pointer;
+  }
+  .sin > button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .sin .name { flex: 1; font-weight: 500; }
+  .sin .count { color: var(--muted); font-size: 14px; font-variant-numeric: tabular-nums; }
+  .sin .arrow { width: 10px; height: 10px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted);
+    transform: rotate(45deg); margin: -4px 4px 0 0; transition: transform .2s; }
+  .sin.open .arrow { transform: rotate(-135deg); margin-top: 4px; }
+  .sin.open > button { background: var(--accent-soft); }
+  .verses { padding: 4px 14px 10px; }
+  .verse { padding: 12px 0; }
+  .verse + .verse { border-top: 1px dashed var(--line); }
+  a.ref { text-decoration: none; display: inline-block; padding: 2px 0; }
+  a.ref:active { opacity: .6; }
+  .ref { display: block; font-size: 14px; font-weight: 600; color: var(--accent); margin-bottom: 2px; }
+  .text { margin: 0; }
+  mark { background: #fbe7b5; color: inherit; border-radius: 3px; padding: 0 1px; }
+  .empty { color: var(--muted); text-align: center; padding: 40px 0; }
+  footer { color: var(--muted); font-size: 13px; padding: 0 0 32px; }
+  @media (prefers-reduced-motion: reduce) { .sin .arrow { transition: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>Что Библия говорит о грехе</h1>
+    <p class="sub">Стихи Ветхого и Нового Завета. Синодальный перевод.</p>
+  </header>
+
+  <div class="bar">
+    <div class="search">
+      <input id="q" type="search" placeholder="Найти грех, например «ложь»" autocomplete="off" aria-label="Поиск греха">
+      <button class="clear" id="clear" aria-label="Очистить поиск">×</button>
+    </div>
+    <div class="chips" id="chips" role="toolbar" aria-label="Категории"></div>
+  </div>
+
+  <main id="main"><p class="empty">Загрузка…</p></main>
+  <footer id="foot"></footer>
+</div>
+
+<script>
+(function () {
+  var main = document.getElementById('main');
+  var chipsEl = document.getElementById('chips');
+  var q = document.getElementById('q');
+  var clearBtn = document.getElementById('clear');
+  var data = null, activeCat = null;
+
+  function norm(s) { return s.toLowerCase().replace(/ё/g, 'е'); }
+  function esc(s) { return s.replace(/[&<>"]/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  function plural(n) {
+    var m10 = n % 10, m100 = n % 100;
+    if (m10 === 1 && m100 !== 11) return 'стих';
+    if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return 'стиха';
+    return 'стихов';
+  }
+  function highlight(name, query) {
+    if (!query) return esc(name);
+    var i = norm(name).indexOf(query);
+    if (i < 0) return esc(name);
+    return esc(name.slice(0, i)) + '<mark>' + esc(name.slice(i, i + query.length)) + '</mark>' + esc(name.slice(i + query.length));
+  }
+
+  // Ссылка открывает стих в приложении Bible (YouVersion), если оно установлено, иначе на bible.com. 400 = Синодальный перевод.
+  var BOOKS = {"Быт.": "GEN", "Исх.": "EXO", "Лев.": "LEV", "Чис.": "NUM", "Втор.": "DEU", "Нав.": "JOS", "Суд.": "JDG", "1 Цар.": "1SA", "2 Цар.": "2SA", "3 Цар.": "1KI", "4 Цар.": "2KI", "1 Пар.": "1CH", "2 Пар.": "2CH", "Езд.": "EZR", "Неем.": "NEH", "Иов.": "JOB", "Пс.": "PSA", "Притч.": "PRO", "Еккл.": "ECC", "Ис.": "ISA", "Иер.": "JER", "Плач.": "LAM", "Иез.": "EZK", "Дан.": "DAN", "Ос.": "HOS", "Иоил.": "JOL", "Ам.": "AMO", "Авд.": "OBA", "Ион.": "JON", "Мих.": "MIC", "Наум.": "NAM", "Авв.": "HAB", "Соф.": "ZEP", "Зах.": "ZEC", "Мал.": "MAL", "Мф.": "MAT", "Мк.": "MRK", "Лк.": "LUK", "Ин.": "JHN", "Деян.": "ACT", "Иак.": "JAS", "1 Пет.": "1PE", "2 Пет.": "2PE", "1 Ин.": "1JN", "2 Ин.": "2JN", "3 Ин.": "3JN", "Иуд.": "JUD", "Рим.": "ROM", "1 Кор.": "1CO", "2 Кор.": "2CO", "Гал.": "GAL", "Еф.": "EPH", "Флп.": "PHP", "Кол.": "COL", "1 Фес.": "1TH", "2 Фес.": "2TH", "1 Тим.": "1TI", "2 Тим.": "2TI", "Тит.": "TIT", "Евр.": "HEB", "Откр.": "REV"};
+  function verseUrl(ref) {
+    var m = /^(.+?)\s*(\d+):(\d+(?:-\d+)?)$/.exec(ref);
+    if (!m || !BOOKS[m[1]]) return null;
+    return 'https://www.bible.com/bible/400/' + BOOKS[m[1]] + '.' + m[2] + '.' + m[3] + '.SYNO';
+  }
+
+  function renderChips() {
+    var html = '<button class="chip" data-cat="" aria-pressed="' + (activeCat === null) + '">Все</button>';
+    data.categories.forEach(function (c, i) {
+      html += '<button class="chip" data-cat="' + i + '" aria-pressed="' + (activeCat === i) + '">' + esc(c.name) + '</button>';
+    });
+    chipsEl.innerHTML = html;
+  }
+
+  function render() {
+    var query = norm(q.value.trim());
+    clearBtn.classList.toggle('show', q.value.length > 0);
+    var html = '';
+    data.categories.forEach(function (c, ci) {
+      if (activeCat !== null && activeCat !== ci) return;
+      var items = '';
+      c.sins.forEach(function (s, si) {
+        if (query && norm(s.name).indexOf(query) < 0) return;
+        var n = s.verses.length;
+        items += '<div class="sin" data-c="' + ci + '" data-s="' + si + '">' +
+          '<button aria-expanded="false"><span class="name">' + highlight(s.name, query) + '</span>' +
+          '<span class="count">' + n + ' ' + plural(n) + '</span><span class="arrow" aria-hidden="true"></span></button></div>';
+      });
+      if (items) html += '<section class="cat"><h2>' + esc(c.name) + '</h2><div class="list">' + items + '</div></section>';
+    });
+    main.innerHTML = html || '<p class="empty">Ничего не нашлось. Попробуйте другое слово.</p>';
+  }
+
+  function toggle(sinEl) {
+    var btn = sinEl.querySelector('button');
+    var open = sinEl.classList.toggle('open');
+    btn.setAttribute('aria-expanded', open);
+    var box = sinEl.querySelector('.verses');
+    if (open && !box) {
+      var s = data.categories[+sinEl.dataset.c].sins[+sinEl.dataset.s];
+      var html = '<div class="verses">';
+      s.verses.forEach(function (v) {
+        var u = verseUrl(v[0]);
+        html += '<div class="verse">' + (u ? '<a class="ref" href="' + u + '" rel="noopener">' + esc(v[0]) + ' ↗</a>' : '<span class="ref">' + esc(v[0]) + '</span>') + '<p class="text">' + esc(v[1]) + '</p></div>';
+      });
+      sinEl.insertAdjacentHTML('beforeend', html + '</div>');
+    } else if (box) {
+      box.hidden = !open;
+    }
+  }
+
+  main.addEventListener('click', function (e) {
+    var btn = e.target.closest('.sin > button');
+    if (btn) toggle(btn.parentNode);
+  });
+  chipsEl.addEventListener('click', function (e) {
+    var chip = e.target.closest('.chip');
+    if (!chip) return;
+    activeCat = chip.dataset.cat === '' ? null : +chip.dataset.cat;
+    renderChips(); render();
+    chip = chipsEl.querySelector('[aria-pressed="true"]');
+    if (chip && chip.scrollIntoView) chip.scrollIntoView({ block: 'nearest', inline: 'center' });
+  });
+  q.addEventListener('input', render);
+  clearBtn.addEventListener('click', function () { q.value = ''; render(); q.focus(); });
+
+  fetch('data.json', { cache: 'no-cache' })
+    .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function (d) {
+      data = d;
+      renderChips(); render();
+      var total = 0, sins = 0;
+      d.categories.forEach(function (c) { sins += c.sins.length; c.sins.forEach(function (s) { total += s.verses.length; }); });
+      document.getElementById('foot').textContent = sins + ' грехов, ' + total + ' ' + plural(total) +
+        '. Текст: Синодальный перевод. Обновлено ' + d.updated.split('-').reverse().join('.') + '.';
+    })
+    .catch(function () { main.innerHTML = '<p class="empty">Не удалось загрузить данные. Обновите страницу.</p>'; });
+})();
+</script>
+</body>
+</html>
