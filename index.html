@@ -74,28 +74,28 @@
     font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: rgba(255,255,255,.8);
     margin: 0 0 8px; font-weight: 600;
   }
-  .list { background: rgba(255,255,255,.94); box-shadow: 0 6px 24px rgba(0,0,0,.25); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
-  .sin + .sin { border-top: 1px solid var(--line); }
+  .list { background: rgba(8,12,10,.72); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); border-color: rgba(255,255,255,.12); box-shadow: 0 6px 24px rgba(0,0,0,.3); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  .sin + .sin { border-top: 1px solid rgba(255,255,255,.1); }
   .sin > button {
     width: 100%; display: flex; align-items: center; gap: 12px; text-align: left;
-    font: inherit; font-size: 17px; color: var(--text); background: none; border: 0;
+    font: inherit; font-size: 17px; color: #fff; background: none; border: 0;
     padding: 14px 14px; min-height: 52px; cursor: pointer;
   }
   .sin > button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
   .sin .name { flex: 1; font-weight: 700; }
-  .sin .count { color: var(--muted); font-size: 14px; font-variant-numeric: tabular-nums; }
-  .sin .arrow { width: 10px; height: 10px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted);
+  .sin .count { color: rgba(255,255,255,.6); font-size: 14px; font-variant-numeric: tabular-nums; }
+  .sin .arrow { width: 10px; height: 10px; border-right: 2px solid rgba(255,255,255,.7); border-bottom: 2px solid rgba(255,255,255,.7);
     transform: rotate(45deg); margin: -4px 4px 0 0; transition: transform .2s; }
   .sin.open .arrow { transform: rotate(-135deg); margin-top: 4px; }
-  .sin.open > button { background: var(--accent-soft); }
+  .sin.open > button { background: rgba(255,255,255,.08); }
   .verses { padding: 4px 14px 10px; }
   .verse { padding: 12px 0; }
-  .verse + .verse { border-top: 1px dashed var(--line); }
+  .verse + .verse { border-top: 1px dashed rgba(255,255,255,.14); }
   a.ref { text-decoration: none; display: inline-block; padding: 2px 0; }
   a.ref:active { opacity: .6; }
-  .ref { display: block; font-size: 14px; font-weight: 600; color: var(--accent); margin-bottom: 2px; }
-  .text { margin: 0; }
-  mark { background: #fbe7b5; color: inherit; border-radius: 3px; padding: 0 1px; }
+  .ref { display: block; font-size: 14px; font-weight: 600; color: #e8c98a; margin-bottom: 2px; }
+  .text { margin: 0; color: rgba(255,255,255,.92); }
+  mark { background: rgba(232,201,138,.45); color: inherit; border-radius: 3px; padding: 0 1px; }
   .empty { color: rgba(255,255,255,.85); text-align: center; padding: 40px 0; }
   footer { color: rgba(255,255,255,.7); font-size: 13px; padding: 0 0 32px; }
   @media (prefers-reduced-motion: reduce) { .sin .arrow { transition: none; } }
