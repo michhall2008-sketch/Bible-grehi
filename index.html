@@ -74,18 +74,38 @@
   }
   .list { background: rgba(8,12,10,.72); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); border: 0; box-shadow: 0 6px 24px rgba(0,0,0,.3); border-radius: var(--radius); overflow: hidden; }
   .sin + .sin { border-top: 1px solid rgba(255,255,255,.1); }
-  .sin > button {
+  .row { display: flex; align-items: stretch; }
+  .row > .open-btn { flex: 1; min-width: 0; }
+  .help { flex: 0 0 auto; width: 48px; border: 0; background: none; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0 4px 0 0; }
+  .help span { width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,.55); color: rgba(255,255,255,.85); font: 700 15px/23px Arial, sans-serif; text-align: center; }
+  .help[aria-pressed="true"] span { background: #e8c98a; border-color: #e8c98a; color: #1b2420; }
+  .help:focus-visible { outline: 2px solid #e8c98a; outline-offset: -4px; }
+  .explain { margin: 6px 14px 4px; padding: 12px 14px; border-radius: 10px; background: rgba(232,201,138,.12); color: rgba(255,255,255,.92); font-size: 15px; }
+  .explain p { margin: 0; }
+  .explain p + p { margin-top: 8px; }
+  .explain b { color: #e8c98a; display: block; font-size: 13px; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 2px; }
+  .tabs { display: flex; gap: 8px; margin-top: 14px; }
+  .tab { font: inherit; font-size: 15px; padding: 8px 16px; border-radius: 999px; border: 1px solid rgba(255,255,255,.35); background: rgba(255,255,255,.08); color: #fff; cursor: pointer; text-decoration: none; }
+  .tab[aria-current="page"] { background: #fff; color: #1b2420; border-color: #fff; }
+  .dict { padding: 16px 14px; }
+  .dict + .dict { border-top: 1px solid rgba(255,255,255,.1); }
+  .dict h3 { margin: 0; font-size: 18px; font-weight: 700; color: #fff; }
+  .dict .dcat { font-size: 13px; color: rgba(255,255,255,.55); margin: 2px 0 8px; }
+  .dict .explain { margin: 0 0 10px; }
+  .dict a.go { color: #e8c98a; font-size: 14px; font-weight: 700; text-decoration: none; }
+  .letter { font-size: 22px; font-weight: 700; color: #fff; margin: 22px 0 8px; }
+  .sin .open-btn {
     width: 100%; display: flex; align-items: center; gap: 12px; text-align: left;
     font: inherit; font-size: 17px; color: #fff; background: none; border: 0;
     padding: 14px 14px; min-height: 52px; cursor: pointer;
   }
-  .sin > button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .sin .open-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
   .sin .name { flex: 1; font-weight: 700; }
   .sin .count { color: rgba(255,255,255,.6); font-size: 14px; font-variant-numeric: tabular-nums; }
   .sin .arrow { width: 10px; height: 10px; border-right: 2px solid rgba(255,255,255,.7); border-bottom: 2px solid rgba(255,255,255,.7);
     transform: rotate(45deg); margin: -4px 4px 0 0; transition: transform .2s; }
   .sin.open .arrow { transform: rotate(-135deg); margin-top: 4px; }
-  .sin.open > button { background: rgba(255,255,255,.08); }
+  .sin.open > .row { background: rgba(255,255,255,.08); }
   .verses { padding: 4px 14px 10px; }
   .verse { padding: 12px 0; }
   .verse + .verse { border-top: 1px dashed rgba(255,255,255,.14); }
@@ -105,9 +125,13 @@
   <header class="top">
     <h1>Что Библия говорит о грехе</h1>
     <p class="sub">Стихи Ветхого и Нового Завета. Синодальный перевод.</p>
+    <nav class="tabs" aria-label="Разделы">
+      <a class="tab" href="#" id="tab-main" aria-current="page">Грехи и стихи</a>
+      <a class="tab" href="#slovar" id="tab-dict">Словарь</a>
+    </nav>
   </header>
 
-  <div class="bar">
+  <div class="bar" id="bar">
     <div class="search">
       <input id="q" type="search" placeholder="Найти грех, например «ложь»" autocomplete="off" aria-label="Поиск греха">
       <button class="clear" id="clear" aria-label="Очистить поиск">×</button>
@@ -169,16 +193,33 @@
         if (query && norm(s.name).indexOf(query) < 0) return;
         var n = s.verses.length;
         items += '<div class="sin" data-c="' + ci + '" data-s="' + si + '">' +
-          '<button aria-expanded="false"><span class="name">' + highlight(s.name, query) + '</span>' +
-          '<span class="count">' + n + ' ' + plural(n) + '</span><span class="arrow" aria-hidden="true"></span></button></div>';
+          '<div class="row"><button class="open-btn" aria-expanded="false"><span class="name">' + highlight(s.name, query) + '</span>' +
+          '<span class="count">' + n + ' ' + plural(n) + '</span><span class="arrow" aria-hidden="true"></span></button>' +
+          (s.meaning ? '<button class="help" aria-pressed="false" aria-label="Что значит «' + esc(s.name) + '»"><span>?</span></button>' : '') +
+          '</div></div>';
       });
       if (items) html += '<section class="cat"><h2>' + esc(c.name) + '</h2><div class="list">' + items + '</div></section>';
     });
     main.innerHTML = html || '<p class="empty">Ничего не нашлось. Попробуйте другое слово.</p>';
   }
 
+  function explainHtml(s) {
+    return '<div class="explain"><p><b>Что это значит</b>' + esc(s.meaning) + '</p>' +
+      (s.example ? '<p><b>Пример из жизни</b>' + esc(s.example) + '</p>' : '') + '</div>';
+  }
+
+  function toggleHelp(sinEl, helpBtn) {
+    var s = data.categories[+sinEl.dataset.c].sins[+sinEl.dataset.s];
+    if (!sinEl.classList.contains('open')) toggle(sinEl);
+    var box = sinEl.querySelector('.explain');
+    var on = helpBtn.getAttribute('aria-pressed') !== 'true';
+    helpBtn.setAttribute('aria-pressed', on);
+    if (on && !box) sinEl.querySelector('.row').insertAdjacentHTML('afterend', explainHtml(s));
+    else if (box) box.hidden = !on;
+  }
+
   function toggle(sinEl) {
-    var btn = sinEl.querySelector('button');
+    var btn = sinEl.querySelector('.open-btn');
     var open = sinEl.classList.toggle('open');
     btn.setAttribute('aria-expanded', open);
     var box = sinEl.querySelector('.verses');
@@ -193,11 +234,55 @@
     } else if (box) {
       box.hidden = !open;
     }
+    var ex = sinEl.querySelector('.explain'), hb = sinEl.querySelector('.help');
+    if (!open && ex) { ex.hidden = true; hb.setAttribute('aria-pressed', 'false'); }
   }
 
+  function renderDict() {
+    var all = [];
+    data.categories.forEach(function (c, ci) { c.sins.forEach(function (s, si) { if (s.meaning) all.push({ s: s, c: c.name, ci: ci, si: si }); }); });
+    all.sort(function (a, b) { return a.s.name.localeCompare(b.s.name, 'ru'); });
+    var html = '', letter = '', group = '';
+    all.forEach(function (x) {
+      var L = x.s.name.charAt(0).toUpperCase();
+      if (L !== letter) {
+        if (group) html += group + '</div>';
+        letter = L; html += '<h2 class="letter">' + esc(L) + '</h2>'; group = '<div class="list">';
+      }
+      group += '<article class="dict"><h3>' + esc(x.s.name) + '</h3><p class="dcat">' + esc(x.c) + '</p>' + explainHtml(x.s) +
+        '<a class="go" href="#" data-c="' + x.ci + '" data-s="' + x.si + '">Стихи: ' + x.s.verses.length + ' ' + plural(x.s.verses.length) + ' →</a></article>';
+    });
+    if (group) html += group + '</div>';
+    main.innerHTML = html;
+  }
+
+  var bar = document.getElementById('bar');
+  function route() {
+    var dict = location.hash === '#slovar';
+    document.getElementById('tab-main').toggleAttribute('aria-current', !dict);
+    document.getElementById('tab-dict').toggleAttribute('aria-current', dict);
+    if (dict) document.getElementById('tab-dict').setAttribute('aria-current', 'page'); else document.getElementById('tab-main').setAttribute('aria-current', 'page');
+    bar.hidden = dict;
+    if (!data) return;
+    if (dict) renderDict(); else render();
+  }
+  window.addEventListener('hashchange', function () { route(); window.scrollTo(0, 0); });
+
   main.addEventListener('click', function (e) {
-    var btn = e.target.closest('.sin > button');
-    if (btn) toggle(btn.parentNode);
+    var go = e.target.closest('a.go');
+    if (go) {
+      e.preventDefault();
+      var ci = +go.dataset.c, si = +go.dataset.s;
+      q.value = ''; activeCat = ci;
+      history.pushState(null, '', location.pathname); route(); renderChips();
+      var el = main.querySelector('.sin[data-c="' + ci + '"][data-s="' + si + '"]');
+      if (el) { toggle(el); el.scrollIntoView({ block: 'start' }); }
+      return;
+    }
+    var help = e.target.closest('.help');
+    if (help) { toggleHelp(help.closest('.sin'), help); return; }
+    var btn = e.target.closest('.open-btn');
+    if (btn) toggle(btn.closest('.sin'));
   });
   chipsEl.addEventListener('click', function (e) {
     var chip = e.target.closest('.chip');
@@ -214,7 +299,7 @@
     .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
     .then(function (d) {
       data = d;
-      renderChips(); render();
+      renderChips(); route();
       var total = 0, sins = 0;
       d.categories.forEach(function (c) { sins += c.sins.length; c.sins.forEach(function (s) { total += s.verses.length; }); });
       document.getElementById('foot').textContent = sins + ' грехов, ' + total + ' ' + plural(total) +
