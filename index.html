@@ -32,11 +32,11 @@
   .bg::after { content: ""; position: absolute; inset: 0; background: linear-gradient(rgba(10,14,12,.55), rgba(10,14,12,.72)); }
   @media (max-aspect-ratio: 1/1), (max-width: 700px) { .bg { background-image: url("fon-telefon.jpg"); } }
   .wrap { max-width: 720px; margin: 0 auto; padding: 0 16px; }
-  header.top { padding: 28px 0 8px; }
+  header.top { margin: 20px 0 12px; padding: 20px 20px 18px; background: rgba(8,12,10,.55); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); border-radius: 18px; }
   h1 { font-family: "Great Vibes", cursive; font-size: 50px; line-height: 1.15; margin: 0 0 6px; font-weight: 400; color: #fff; text-shadow: 0 2px 12px rgba(0,0,0,.5); }
   .sub { color: rgba(255,255,255,.85); font-size: 15px; margin: 0; }
   @media (min-width: 752px) { .bar { border-radius: 0 0 14px 14px; } }
-  @media (min-width: 700px) { h1 { font-size: 68px; } header.top { padding: 56px 0 16px; } }
+  @media (min-width: 700px) { h1 { font-size: 68px; } header.top { margin: 40px 0 16px; padding: 32px 36px 28px; } }
 
   .bar {
     position: sticky; top: 0; z-index: 5; background: rgba(14,20,17,.6); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
@@ -74,7 +74,7 @@
     font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: rgba(255,255,255,.8);
     margin: 0 0 8px; font-weight: 600;
   }
-  .list { background: rgba(8,12,10,.72); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); border-color: rgba(255,255,255,.12); box-shadow: 0 6px 24px rgba(0,0,0,.3); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  .list { background: rgba(8,12,10,.72); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); border: 0; box-shadow: 0 6px 24px rgba(0,0,0,.3); border-radius: var(--radius); overflow: hidden; }
   .sin + .sin { border-top: 1px solid rgba(255,255,255,.1); }
   .sin > button {
     width: 100%; display: flex; align-items: center; gap: 12px; text-align: left;
