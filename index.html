@@ -84,6 +84,13 @@
   .explain p { margin: 0; }
   .explain p + p { margin-top: 8px; }
   .explain b { color: #e8c98a; display: block; font-size: 13px; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 2px; }
+  header.top { position: relative; }
+  .lang { position: absolute; top: 14px; right: 14px; display: flex; border: 1px solid rgba(255,255,255,.35); border-radius: 999px; overflow: hidden; }
+  .lang button { font: 700 13px/1 Arial, sans-serif; letter-spacing: .04em; padding: 8px 11px; border: 0; background: transparent; color: rgba(255,255,255,.8); cursor: pointer; }
+  .lang button[aria-pressed="true"] { background: #fff; color: #1b2420; }
+  .lang button:focus-visible { outline: 2px solid #e8c98a; outline-offset: -2px; }
+  @media (max-width: 699px) { .lang { position: static; width: max-content; margin: -6px -6px 2px auto; } }
+  @media (min-width: 700px) { h1 { padding-right: 96px; } .lang { top: 22px; right: 22px; } }
   .tabs { display: flex; gap: 8px; margin-top: 14px; }
   .tab { font: inherit; font-size: 15px; padding: 8px 16px; border-radius: 999px; border: 1px solid rgba(255,255,255,.35); background: rgba(255,255,255,.08); color: #fff; cursor: pointer; text-decoration: none; }
   .tab[aria-current="page"] { background: #fff; color: #1b2420; border-color: #fff; }
@@ -123,20 +130,23 @@
 <div class="bg" aria-hidden="true"></div>
 <div class="wrap">
   <header class="top">
-    <h1>Что Библия говорит о грехе</h1>
-    <p class="sub">Стихи Ветхого и Нового Завета. Синодальный перевод.</p>
-    <nav class="tabs" aria-label="Разделы">
-      <a class="tab" href="#" id="tab-main" aria-current="page">Грехи и стихи</a>
-      <a class="tab" href="#slovar" id="tab-dict">Словарь</a>
+    <div class="lang" role="group" aria-label="Язык / Jazyk">
+      <button type="button" data-lang="ru" lang="ru">RU</button><button type="button" data-lang="sk" lang="sk">SK</button>
+    </div>
+    <h1 data-t="title">Что Библия говорит о грехе</h1>
+    <p class="sub" data-t="sub">Стихи Ветхого и Нового Завета. Синодальный перевод.</p>
+    <nav class="tabs" aria-label="Разделы" data-t-label="sections">
+      <a class="tab" href="#" id="tab-main" aria-current="page" data-t="tabMain">Грехи и стихи</a>
+      <a class="tab" href="#slovar" id="tab-dict" data-t="tabDict">Словарь</a>
     </nav>
   </header>
 
   <div class="bar" id="bar">
     <div class="search">
-      <input id="q" type="search" placeholder="Найти грех, например «ложь»" autocomplete="off" aria-label="Поиск греха">
-      <button class="clear" id="clear" aria-label="Очистить поиск">×</button>
+      <input id="q" type="search" placeholder="Найти грех, например «ложь»" autocomplete="off" aria-label="Поиск греха" data-t-ph="ph" data-t-label="searchLabel">
+      <button class="clear" id="clear" aria-label="Очистить поиск" data-t-label="clear">×</button>
     </div>
-    <div class="chips" id="chips" role="toolbar" aria-label="Категории"></div>
+    <div class="chips" id="chips" role="toolbar" aria-label="Категории" data-t-label="cats"></div>
   </div>
 
   <main id="main"><p class="empty">Загрузка…</p></main>
@@ -149,15 +159,41 @@
   var chipsEl = document.getElementById('chips');
   var q = document.getElementById('q');
   var clearBtn = document.getElementById('clear');
-  var data = null, activeCat = null;
+  var data = null, activeCat = null, lang = 'ru', cache = {};
 
-  function norm(s) { return s.toLowerCase().replace(/ё/g, 'е'); }
+  // Тексты интерфейса (лист «Rozhranie SK»).
+  var T = {
+    ru: { title: 'Что Библия говорит о грехе', sub: 'Стихи Ветхого и Нового Завета. Синодальный перевод.',
+      desc: 'Список грехов и стихи Библии о каждом из них. Синодальный перевод.',
+      tabMain: 'Грехи и стихи', tabDict: 'Словарь', sections: 'Разделы', ph: 'Найти грех, например «ложь»',
+      searchLabel: 'Поиск греха', clear: 'Очистить поиск', cats: 'Категории', all: 'Все', loading: 'Загрузка…',
+      error: 'Не удалось загрузить данные. Обновите страницу.', empty: 'Ничего не нашлось. Попробуйте другое слово.',
+      meaning: 'Что это значит', example: 'Пример из жизни', help: 'Что значит «%»', verses: 'Стихи',
+      v: ['стих', 'стиха', 'стихов'], sins: '% грехов', tr: 'Текст: Синодальный перевод.', upd: 'Обновлено %.' },
+    sk: { title: 'Čo hovorí Biblia o hriechu', sub: 'Verše zo Starej a Novej zmluvy. Roháčkov preklad.',
+      desc: 'Zoznam hriechov a biblické verše o každom z nich. Roháčkov preklad.',
+      tabMain: 'Hriechy a verše', tabDict: 'Slovník', sections: 'Sekcie', ph: 'Nájdi hriech, napríklad „lož“',
+      searchLabel: 'Hľadať hriech', clear: 'Vymazať hľadanie', cats: 'Kategórie', all: 'Všetky', loading: 'Načítava sa…',
+      error: 'Údaje sa nepodarilo načítať. Obnovte stránku.', empty: 'Nič sa nenašlo. Skúste iné slovo.',
+      meaning: 'Čo to znamená', example: 'Príklad zo života', help: 'Čo znamená „%“', verses: 'Verše',
+      v: ['verš', 'verše', 'veršov'], sins: '% hriechov', tr: 'Text: Roháčkov preklad.', upd: 'Aktualizované %.' }
+  };
+  function t(k) { return T[lang][k]; }
+
+  // Поиск без учёта регистра, ё/е и словацких диакритик; длина строки сохраняется для подсветки.
+  function norm(s) {
+    return s.toLowerCase().split('').map(function (ch) {
+      return ch === 'ё' ? 'е' : (ch.normalize ? ch.normalize('NFD').charAt(0) : ch);
+    }).join('');
+  }
   function esc(s) { return s.replace(/[&<>"]/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
   function plural(n) {
+    var f = t('v');
+    if (lang === 'sk') return n === 1 ? f[0] : (n >= 2 && n <= 4 ? f[1] : f[2]);
     var m10 = n % 10, m100 = n % 100;
-    if (m10 === 1 && m100 !== 11) return 'стих';
-    if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return 'стиха';
-    return 'стихов';
+    if (m10 === 1 && m100 !== 11) return f[0];
+    if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return f[1];
+    return f[2];
   }
   function highlight(name, query) {
     if (!query) return esc(name);
@@ -168,14 +204,16 @@
 
   // Ссылка открывает стих в приложении Bible (YouVersion), если оно установлено, иначе на bible.com. 400 = Синодальный перевод.
   var BOOKS = {"Быт.": "GEN", "Исх.": "EXO", "Лев.": "LEV", "Чис.": "NUM", "Втор.": "DEU", "Нав.": "JOS", "Суд.": "JDG", "1 Цар.": "1SA", "2 Цар.": "2SA", "3 Цар.": "1KI", "4 Цар.": "2KI", "1 Пар.": "1CH", "2 Пар.": "2CH", "Езд.": "EZR", "Неем.": "NEH", "Иов.": "JOB", "Пс.": "PSA", "Притч.": "PRO", "Еккл.": "ECC", "Ис.": "ISA", "Иер.": "JER", "Плач.": "LAM", "Иез.": "EZK", "Дан.": "DAN", "Ос.": "HOS", "Иоил.": "JOL", "Ам.": "AMO", "Авд.": "OBA", "Ион.": "JON", "Мих.": "MIC", "Наум.": "NAM", "Авв.": "HAB", "Соф.": "ZEP", "Зах.": "ZEC", "Мал.": "MAL", "Мф.": "MAT", "Мк.": "MRK", "Лк.": "LUK", "Ин.": "JHN", "Деян.": "ACT", "Иак.": "JAS", "1 Пет.": "1PE", "2 Пет.": "2PE", "1 Ин.": "1JN", "2 Ин.": "2JN", "3 Ин.": "3JN", "Иуд.": "JUD", "Рим.": "ROM", "1 Кор.": "1CO", "2 Кор.": "2CO", "Гал.": "GAL", "Еф.": "EPH", "Флп.": "PHP", "Кол.": "COL", "1 Фес.": "1TH", "2 Фес.": "2TH", "1 Тим.": "1TI", "2 Тим.": "2TI", "Тит.": "TIT", "Евр.": "HEB", "Откр.": "REV"};
-  function verseUrl(ref) {
+  function verseUrl(v) {
+    if (v[2]) return v[2]; // словацкий: глава на mojabiblia.sk
+    var ref = v[0];
     var m = /^(.+?)\s*(\d+):(\d+(?:-\d+)?)$/.exec(ref);
     if (!m || !BOOKS[m[1]]) return null;
     return 'https://www.bible.com/bible/400/' + BOOKS[m[1]] + '.' + m[2] + '.' + m[3] + '.SYNO';
   }
 
   function renderChips() {
-    var html = '<button class="chip" data-cat="" aria-pressed="' + (activeCat === null) + '">Все</button>';
+    var html = '<button class="chip" data-cat="" aria-pressed="' + (activeCat === null) + '">' + t('all') + '</button>';
     data.categories.forEach(function (c, i) {
       html += '<button class="chip" data-cat="' + i + '" aria-pressed="' + (activeCat === i) + '">' + esc(c.name) + '</button>';
     });
@@ -195,17 +233,17 @@
         items += '<div class="sin" data-c="' + ci + '" data-s="' + si + '">' +
           '<div class="row"><button class="open-btn" aria-expanded="false"><span class="name">' + highlight(s.name, query) + '</span>' +
           '<span class="count">' + n + ' ' + plural(n) + '</span><span class="arrow" aria-hidden="true"></span></button>' +
-          (s.meaning ? '<button class="help" aria-pressed="false" aria-label="Что значит «' + esc(s.name) + '»"><span>?</span></button>' : '') +
+          (s.meaning ? '<button class="help" aria-pressed="false" aria-label="' + esc(t('help').replace('%', s.name)) + '"><span>?</span></button>' : '') +
           '</div></div>';
       });
       if (items) html += '<section class="cat"><h2>' + esc(c.name) + '</h2><div class="list">' + items + '</div></section>';
     });
-    main.innerHTML = html || '<p class="empty">Ничего не нашлось. Попробуйте другое слово.</p>';
+    main.innerHTML = html || '<p class="empty">' + t('empty') + '</p>';
   }
 
   function explainHtml(s) {
-    return '<div class="explain"><p><b>Что это значит</b>' + esc(s.meaning) + '</p>' +
-      (s.example ? '<p><b>Пример из жизни</b>' + esc(s.example) + '</p>' : '') + '</div>';
+    return '<div class="explain"><p><b>' + t('meaning') + '</b>' + esc(s.meaning) + '</p>' +
+      (s.example ? '<p><b>' + t('example') + '</b>' + esc(s.example) + '</p>' : '') + '</div>';
   }
 
   function toggleHelp(sinEl, helpBtn) {
@@ -227,7 +265,7 @@
       var s = data.categories[+sinEl.dataset.c].sins[+sinEl.dataset.s];
       var html = '<div class="verses">';
       s.verses.forEach(function (v) {
-        var u = verseUrl(v[0]);
+        var u = verseUrl(v);
         html += '<div class="verse">' + (u ? '<a class="ref" href="' + u + '" rel="noopener">' + esc(v[0]) + ' ↗\uFE0E</a>' : '<span class="ref">' + esc(v[0]) + '</span>') + '<p class="text">' + esc(v[1]) + '</p></div>';
       });
       sinEl.insertAdjacentHTML('beforeend', html + '</div>');
@@ -241,7 +279,7 @@
   function renderDict() {
     var all = [];
     data.categories.forEach(function (c, ci) { c.sins.forEach(function (s, si) { if (s.meaning) all.push({ s: s, c: c.name, ci: ci, si: si }); }); });
-    all.sort(function (a, b) { return a.s.name.localeCompare(b.s.name, 'ru'); });
+    all.sort(function (a, b) { return a.s.name.localeCompare(b.s.name, lang); });
     var html = '', letter = '', group = '';
     all.forEach(function (x) {
       var L = x.s.name.charAt(0).toUpperCase();
@@ -250,7 +288,7 @@
         letter = L; html += '<h2 class="letter">' + esc(L) + '</h2>'; group = '<div class="list">';
       }
       group += '<article class="dict"><h3>' + esc(x.s.name) + '</h3><p class="dcat">' + esc(x.c) + '</p>' + explainHtml(x.s) +
-        '<a class="go" href="#" data-c="' + x.ci + '" data-s="' + x.si + '">Стихи: ' + x.s.verses.length + ' ' + plural(x.s.verses.length) + ' →</a></article>';
+        '<a class="go" href="#" data-c="' + x.ci + '" data-s="' + x.si + '">' + t('verses') + ': ' + x.s.verses.length + ' ' + plural(x.s.verses.length) + ' →</a></article>';
     });
     if (group) html += group + '</div>';
     main.innerHTML = html;
@@ -295,17 +333,47 @@
   q.addEventListener('input', render);
   clearBtn.addEventListener('click', function () { q.value = ''; render(); q.focus(); });
 
-  fetch('data.json', { cache: 'no-cache' })
-    .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
-    .then(function (d) {
+  function applyTexts() {
+    document.documentElement.lang = lang;
+    document.title = t('title');
+    document.querySelector('meta[name="description"]').setAttribute('content', t('desc'));
+    [].forEach.call(document.querySelectorAll('[data-t]'), function (el) { el.textContent = t(el.dataset.t); });
+    [].forEach.call(document.querySelectorAll('[data-t-label]'), function (el) { el.setAttribute('aria-label', t(el.dataset.tLabel)); });
+    [].forEach.call(document.querySelectorAll('[data-t-ph]'), function (el) { el.placeholder = t(el.dataset.tPh); });
+    [].forEach.call(document.querySelectorAll('.lang button'), function (b) { b.setAttribute('aria-pressed', b.dataset.lang === lang); });
+  }
+
+  function footer(d) {
+    var total = 0, sins = 0;
+    d.categories.forEach(function (c) { sins += c.sins.length; c.sins.forEach(function (s) { total += s.verses.length; }); });
+    document.getElementById('foot').textContent = t('sins').replace('%', sins) + ', ' + total + ' ' + plural(total) +
+      '. ' + t('tr') + ' ' + t('upd').replace('%', d.updated.split('-').reverse().join('.'));
+  }
+
+  function setLang(l, remember) {
+    lang = l;
+    if (remember) { try { localStorage.setItem('lang', l); } catch (e) {} }
+    applyTexts();
+    if (!data) main.innerHTML = '<p class="empty">' + t('loading') + '</p>';
+    var file = l === 'sk' ? 'data-sk.json' : 'data.json';
+    var p = cache[l] || (cache[l] = fetch(file, { cache: 'no-cache' }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }));
+    p.then(function (d) {
+      if (lang !== l) return;
       data = d;
-      renderChips(); route();
-      var total = 0, sins = 0;
-      d.categories.forEach(function (c) { sins += c.sins.length; c.sins.forEach(function (s) { total += s.verses.length; }); });
-      document.getElementById('foot').textContent = sins + ' грехов, ' + total + ' ' + plural(total) +
-        '. Текст: Синодальный перевод. Обновлено ' + d.updated.split('-').reverse().join('.') + '.';
-    })
-    .catch(function () { main.innerHTML = '<p class="empty">Не удалось загрузить данные. Обновите страницу.</p>'; });
+      renderChips(); route(); footer(d);
+    }).catch(function () { delete cache[l]; main.innerHTML = '<p class="empty">' + t('error') + '</p>'; });
+  }
+
+  document.querySelector('.lang').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-lang]');
+    if (b && b.dataset.lang !== lang) setLang(b.dataset.lang, true);
+  });
+
+  // Язык: сохранённый выбор, иначе язык телефона (словацкий или чешский -> SK), иначе русский.
+  var saved = null;
+  try { saved = localStorage.getItem('lang'); } catch (e) {}
+  var nav = (navigator.languages && navigator.languages[0]) || navigator.language || '';
+  setLang(saved === 'ru' || saved === 'sk' ? saved : (/^(sk|cs)/i.test(nav) ? 'sk' : 'ru'), false);
 })();
 </script>
 </body>
