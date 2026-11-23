@@ -7,9 +7,7 @@
 <title>Что Библия говорит о грехе</title>
 <meta name="description" content="Список грехов и стихи Библии о каждом из них. Синодальный перевод.">
 <meta name="theme-color" content="#1b2420">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+<link rel="preload" href="atziluth-title.woff2" as="font" type="font/woff2" crossorigin>
 <style>
   :root {
     --bg: #faf9f6;
@@ -23,6 +21,8 @@
   }
   * { box-sizing: border-box; }
   html { -webkit-text-size-adjust: 100%; }
+  /* Шрифт названия: Atziluth Script (только буквы названия; Č добавлена вручную из háčku). */
+  @font-face { font-family: "Atziluth"; src: url("atziluth-title.woff2") format("woff2"); font-display: swap; }
   body {
     margin: 0; background: #1b2420; color: var(--text);
     font: 17px/1.55 Arial, "Helvetica Neue", Helvetica, sans-serif;
@@ -33,7 +33,7 @@
   @media (max-aspect-ratio: 1/1), (max-width: 700px) { .bg { background-image: url("fon-telefon.jpg"); } }
   .wrap { max-width: 720px; margin: 0 auto; padding: 0 16px; }
   header.top { margin: 20px 0 12px; padding: 20px 20px 18px; background: rgba(8,12,10,.55); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); border-radius: 18px; }
-  h1 { font-family: "Great Vibes", cursive; font-size: 50px; line-height: 0.95; margin: 0 0 6px; font-weight: 400; color: #fff; text-shadow: 0 2px 12px rgba(0,0,0,.5); }
+  h1 { font-family: "Atziluth", cursive; font-size: 50px; line-height: 0.95; margin: 0 0 6px; font-weight: 400; color: #fff; text-shadow: 0 2px 12px rgba(0,0,0,.5); }
   .sub { color: rgba(255,255,255,.85); font-size: 15px; margin: 0; }
   @media (min-width: 700px) { h1 { font-size: 68px; } header.top { margin: 40px 0 16px; padding: 32px 36px 28px; } }
 
