@@ -16,9 +16,10 @@ from urllib.parse import quote
 TODAY = datetime.date.today().isoformat()
 
 RU = dict(verses=("Категория", "Грех", "Ссылка", "Текст стиха", None),
-          slovar=("Грех", "Что это значит", "Пример из жизни"))
+          slovar=("Грех", "Что это значит", "Пример из жизни"), syn="Синонимы")
 SK = dict(verses=("Kategória", "Hriech", "Odkaz", "Text verša", "Odkaz na mojabiblia.sk"),
-          slovar=("Hriech", "Čo to znamená", "Príklad zo života"))
+          slovar=("Hriech", "Čo to znamená", "Príklad zo života"), syn="Synonymá")
+# Необязательный столбец синонимов в листе словаря: слова и фразы через запятую, для поиска на сайте.
 
 
 def sheet_rows(sheet):
@@ -52,14 +53,22 @@ def csv_rows(path):
 
 def build(rows, slovar, cols):
     vc, sc = cols["verses"], cols["slovar"]
-    meaning = {}
+    meaning, syn = {}, {}
     if slovar:
         h = [x.strip() for x in slovar[0]]
         gi, mi, ei = (h.index(n) for n in sc)
+        si = h.index(cols["syn"]) if cols["syn"] in h else None
         for r in slovar[1:]:
             r = r + [""] * (len(h) - len(r))
-            if r[gi].strip():
-                meaning[r[gi].strip()] = (r[mi].strip(), r[ei].strip())
+            g = r[gi].strip()
+            if not g:
+                continue
+            if r[mi].strip():
+                meaning[g] = (r[mi].strip(), r[ei].strip())
+            if si is not None:
+                words = [w.strip() for w in r[si].split(",") if w.strip()]
+                if words:
+                    syn[g] = words
     header = [h.strip() for h in rows[0]]
     idx = [header.index(n) if n else None for n in vc]
     cats = {}
@@ -79,7 +88,8 @@ def build(rows, slovar, cols):
         "updated": TODAY,
         "categories": [
             {"name": c, "sins": [dict({"name": g, "verses": v},
-                                      **({"meaning": meaning[g][0], "example": meaning[g][1]} if g in meaning else {}))
+                                      **({"meaning": meaning[g][0], "example": meaning[g][1]} if g in meaning else {}),
+                                      **({"syn": syn[g]} if g in syn else {}))
                                  for g, v in sins.items()]}
             for c, sins in cats.items()
         ],
